@@ -19,12 +19,12 @@ tftpd-configure:
 tftpd:
 	mirage build bin/config.ml
 
-clean: mirage-clean
+clean:
 	$(SETUP) -clean $(CLEANFLAGS)
 	mirage clean bin/config.ml
 
-distclean: mirage-clean
-	$(RM) lib/META lib/*.ml*lib
+distclean:
+	$(RM) lib/META lib/*.ml*lib lib/*.mlpack
 
 
 setup-clean: distclean
