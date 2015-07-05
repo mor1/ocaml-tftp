@@ -14,14 +14,16 @@
 
 lib: build reinstall
 
-tftpd-configure:
+configure:
 	mirage configure bin/config.ml
+
 tftpd:
+	[ ! -r bin/Makefile ] && mirage configure --no-depext bin/config.ml || true
 	mirage build bin/config.ml
 
 clean:
 	$(SETUP) -clean $(CLEANFLAGS)
-	mirage clean bin/config.ml
+	[ -r bin/Makefile ] && mirage clean bin/config.ml
 
 distclean:
 	$(RM) lib/META lib/*.ml*lib lib/*.mlpack
