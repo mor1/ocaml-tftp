@@ -82,15 +82,15 @@ module Make(C:V1_LWT.CONSOLE)(FS:V1_LWT.KV_RO)(U:V1_LWT.UDPV4) = struct
          );
 
        Wire.(buf |> get_h_opcode |> int_to_opcode |> function
-         | None -> error c buf
+         | None -> error t (Cstruct.debug buf)
          | Some o ->
            let buf = Cstruct.shift buf sizeof_h in
            match o with
-           | RRQ -> handle_rrq c buf
-           | WRQ -> handle_wrq c buf
-           | DATA -> handle_data c buf
-           | ACK -> handle_ack c buf
-           | ERROR -> handle_error c buf
+           | RRQ -> handle_rrq t buf
+           | WRQ -> handle_wrq t buf
+           | DATA -> handle_data t buf
+           | ACK -> handle_ack t buf
+           | ERROR -> handle_error t buf
          )
     )
 
