@@ -20,10 +20,10 @@ open V1_LWT
 module Main (C: CONSOLE) (FS: KV_RO) (S: STACKV4) = struct
 
   module U = S.UDPV4
-  module T = Tftp.S.Make(C)(U)
+  module T = Tftp.S.Make(C)(FS)(U)
 
   let start c fs s =
-    let callback = T.(make c |> callback) in
+    let callback = T.(make ~c ~fs () |> callback) in
     S.listen_udpv4 s ~port:(T.default_port) callback;
     S.listen s
 

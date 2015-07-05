@@ -19,40 +19,56 @@ open Lwt.Infix
 
 let sp = Printf.sprintf
 
-module Make(C:V1_LWT.CONSOLE)(U:V1_LWT.UDPV4) = struct
+module Make(C:V1_LWT.CONSOLE)(FS:V1_LWT.KV_RO)(U:V1_LWT.UDPV4) = struct
 
   type t = {
     port: int;
-    console: C.t;
+    c: C.t;
+    fs: FS.t;
   }
 
   let default_port = 69
   let port { port; _ } = port
-  let set_port p t = { t with port=p }
+  let set_port port t = { t with port }
 
-  let console { console; _ } = console
-  let set_console c t = { t with console=c }
+  let console { c; _ } = c
+  let set_console c t = { t with c }
 
-  let make ?(port=default_port) ~console = { port; console }
+  let make ?(port=default_port) ~c ~fs () = { port; c; fs }
 
-  let error c buf =
-    C.log_s c (sp "ERROR: opcode=%d" (Wire.get_h_opcode buf))
+  let error { c; _ } msg =
+    let msg = sp "ERROR: %s" msg in
+    C.log_s c msg >>= fun () -> Lwt.fail (Failure msg)
 
-  let handle_rrq c buf =
+  let read_file t n =
+    let { c; fs; _ } = t in
+    FS.size fs n >>= function
+    | `Error (FS.Unknown_key _) -> error t (sp "unknown key: n=%s" n)
+    | `Ok size ->
+      FS.read fs n 0 (Int64.to_int size) >>= function
+      | `Error (FS.Unknown_key _) -> error t (sp "unknown key: n=%s" n)
+      | `Ok bufs -> Lwt.return (Cstruct.copyv bufs)
+
+  let handle_rrq t buf =
+    let { c; fs; _ } = t in
     C.log_s c "RRQ" >>= fun () ->
-    let (filename, buf) = Wire.string0 buf in
-    C.log_s c (sp "filename=%s" filename)
 
-  let handle_wrq c _buf =
+    let (filename, buf) = Wire.string0 buf in
+    C.log_s c (sp "filename=%s" filename) >>= fun () ->
+
+    read_file t filename >>= fun file ->
+    error t file
+
+  let handle_wrq { c; _ } _buf =
     C.log_s c "WRQ"
 
-  let handle_data c _buf =
+  let handle_data { c; _ } _buf =
     C.log_s c "DATA"
 
-  let handle_ack c _buf =
+  let handle_ack { c; _ } _buf =
     C.log_s c "ACK"
 
-  let handle_error c _buf =
+  let handle_error { c; _ } _buf =
     C.log_s c "ERROR"
 
   let callback t =
