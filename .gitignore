@@ -33,3 +33,4 @@ _tags
 
 # Directory containing contents for servingbin: add merlin
 /bin/data
+/bin/static*.ml*
