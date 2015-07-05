@@ -47,7 +47,7 @@ let string0 buf =
   let rec aux s i buf =
     let c = Cstruct.get_char buf i in
     if c = '\x00' then
-      let string = s |> List.rev |> String.concat "/" in
+      let string = s |> List.rev |> String.concat "" in
       (string, Cstruct.shift buf (i+1))
     else
       aux (Char.escaped c :: s) (i+1) buf
