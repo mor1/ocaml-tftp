@@ -1,11 +1,35 @@
-_build
-_tags
-*.native
+# Standard OCaml droppings
+*.annot
+*.cmo
+*.cma
+*.cmi
+*.a
+*.o
+*.cmx
+*.cmxs
+*.cmxa
+
+_build/
+
 *.byte
+*.native
 *.docdir
 
+# Oasis droppings
 setup.data
 setup.log
 
-myocamlbuild.ml
+_tags
 /log
+
+# Mirage droppings
+/bin/tftpd.xe
+/bin/tftpd.xl
+/bin/tftpd_libvirt.xml
+/bin/mir-tftpd
+/bin/log
+/bin/Makefile
+/bin/main.ml
+
+# Directory containing contents for servingbin: add merlin
+/bin/data
