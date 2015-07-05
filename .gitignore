@@ -1,0 +1,11 @@
+_build
+_tags
+*.native
+*.byte
+*.docdir
+
+setup.data
+setup.log
+
+myocamlbuild.ml
+/log

@@ -1,0 +1,3 @@
+PKG mirage mirage-env lwt cstruct tftp.wire tftp
+B _build/**
+B _build/lib_test

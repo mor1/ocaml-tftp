@@ -1,0 +1,49 @@
+OASISFormat: 0.4
+Name:        tftp
+Version:     0.1
+Synopsis:    Trivial FTP
+Authors:     Richard Mortier
+License:     ISC
+Plugins:     META (0.4), DevFiles (0.4)
+BuildTools:  ocamlbuild
+
+Library "tftp-wire"
+  Path:          lib/
+  FindlibName:   wire
+  FindlibParent: tftp
+  Modules:       Wire
+  BuildDepends:  cstruct, cstruct.syntax
+
+Library "tftp"
+  Path:         lib/
+  Pack:         true
+  Findlibname:  tftp
+  Modules:      S
+  BuildDepends: mirage, lwt, tftp.wire
+
+# Document tftp
+#   Title:                TFTP docs
+#   Type:                 OCamlbuild (0.4)
+#   BuildTools+:          ocamldoc
+#   Install:              true
+#   XOCamlbuildPath:      lib/
+#   XOCamlbuildLibraries: tftp
+
+# Executable tftp
+#   Path:           bin/
+#   MainIs:         tftp.ml
+#   CompiledObject: best
+#   BuildDepends:   cmdliner, tftp
+
+# Executable test_tftp
+#   Path:           lib_test
+#   MainIs:         test.ml
+#   Build$:         flag(tests) && flag(unix)
+#   CompiledObject: best
+#   Install:        false
+#   BuildDepends:   tftp, alcotest
+
+# Test test_tftp
+#   Run$:             flag(tests) && flag(unix)
+#   Command:          $test_tftp -q
+#   WorkingDirectory: lib_test
