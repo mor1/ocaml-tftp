@@ -1,8 +1,8 @@
 # OASIS_START
-# DO NOT EDIT (digest: 3f83d8ffc52765f0f969dc029a361de9)
+# DO NOT EDIT (digest: 9bd490a4ee10f21b45e0bae8350030ab)
 version = "0.1"
 description = "Trivial FTP"
-requires = "mirage lwt tftp.wire"
+requires = "mirage lwt tftp.wire io-page"
 archive(byte) = "tftp.cma"
 archive(byte, plugin) = "tftp.cma"
 archive(native) = "tftp.cmxa"
