@@ -35,12 +35,18 @@ cenum opcode {
     ERROR
   } as uint16_t
 
-cstruct h {
+cstruct hreq {
     uint16_t opcode
   } as big_endian
 
-cstruct blockno {
+cstruct hdat {
+    uint16_t opcode;
     uint16_t blockno
+  } as big_endian
+
+cstruct herr {
+    uint16_t opcode;
+    uint16_t errorcode
   } as big_endian
 
 let string0 buf =

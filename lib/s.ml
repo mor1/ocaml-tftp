@@ -14,7 +14,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *)
 
-open Mirage
 open Lwt.Infix
 
 let sp = Printf.sprintf
@@ -25,71 +24,69 @@ module Make(C:V1_LWT.CONSOLE)(FS:V1_LWT.KV_RO)(U:V1_LWT.UDPV4) = struct
     port: int;
     c: C.t;
     fs: FS.t;
+    u: U.t;
   }
 
   let default_port = 69
-  let port { port; _ } = port
-  let set_port port t = { t with port }
 
-  let console { c; _ } = c
-  let set_console c t = { t with c }
-
-  let make ?(port=default_port) ~c ~fs () = { port; c; fs }
+  let make ?(port=default_port) ~c ~fs ~u () = { port; c; fs; u }
 
   let error { c; _ } msg =
     let msg = sp "ERROR: %s" msg in
     C.log_s c msg >>= fun () -> Lwt.fail (Failure msg)
 
   let read_file t n =
-    let { c; fs; _ } = t in
-    FS.size fs n >>= function
+    FS.size t.fs n >>= function
     | `Error (FS.Unknown_key _) -> error t (sp "unknown key: n=%s" n)
     | `Ok size ->
-      FS.read fs n 0 (Int64.to_int size) >>= function
+      FS.read t.fs n 0 (Int64.to_int size) >>= function
       | `Error (FS.Unknown_key _) -> error t (sp "unknown key: n=%s" n)
-      | `Ok bufs -> Lwt.return (Cstruct.copyv bufs)
+      | `Ok bufs -> bufs |> Cstruct.copyv |> Lwt.return
 
-  let handle_rrq t buf =
-    let { c; fs; _ } = t in
-    C.log_s c "RRQ" >>= fun () ->
+  let datap ~blockno ~data =
+    let buf =
+      Cstruct.(set_len (Io_page.get_buf ~n:1 ()) (Wire.sizeof_hdat + len data))
+    in
+    Wire.(set_hdat_opcode buf (opcode_to_int DATA));
+    Wire.(set_hdat_blockno buf blockno);
+    Cstruct.(blit data 0 buf Wire.sizeof_hdat (len data));
+    buf
+
+  let handle_rrq t ((sip,spt), (dip,dpt)) buf =
+    C.log_s t.c "RRQ" >>= fun () ->
 
     let (filename, buf) = Wire.string0 buf in
-    C.log_s c (sp "filename=%s" filename) >>= fun () ->
+    C.log_s t.c (sp "filename=%s" filename) >>= fun () ->
 
-    read_file t filename >>= fun file ->
-    error t file
+    read_file t filename >|= Cstruct.of_string
+    >>= (fun data ->
+        let obuf = datap ~blockno:1 ~data in
+        U.write ~source_port:t.port ~dest_ip:sip ~dest_port:spt t.u obuf
+      )
 
-  let handle_wrq { c; _ } _buf =
-    C.log_s c "WRQ"
-
-  let handle_data { c; _ } _buf =
-    C.log_s c "DATA"
-
-  let handle_ack { c; _ } _buf =
-    C.log_s c "ACK"
+  let unhandled { c; _ } opcode =
+    C.log_s c (sp "%s unhandled!" (Wire.opcode_to_string opcode))
 
   let handle_error { c; _ } _buf =
     C.log_s c "ERROR"
 
   let callback t =
-    let c = console t in
+    let { port; c; _ } = t in
     C.log c "Tftp: starting";
     (fun ~src ~dst ~src_port buf ->
        C.log c
          (sp "Tftp: rx %s.%d -> %s.%d"
             (Ipaddr.V4.to_string src) src_port
-            (Ipaddr.V4.to_string dst) (port t)
+            (Ipaddr.V4.to_string dst) port
          );
 
-       Wire.(buf |> get_h_opcode |> int_to_opcode |> function
+       Wire.(buf |> get_hreq_opcode |> int_to_opcode |> function
          | None -> error t (Cstruct.debug buf)
          | Some o ->
-           let buf = Cstruct.shift buf sizeof_h in
+           let buf = Cstruct.shift buf sizeof_hreq in
            match o with
-           | RRQ -> handle_rrq t buf
-           | WRQ -> handle_wrq t buf
-           | DATA -> handle_data t buf
-           | ACK -> handle_ack t buf
+           | RRQ -> handle_rrq t ((src,src_port), (dst,t.port)) buf
+           | WRQ | DATA | ACK -> unhandled t o
            | ERROR -> handle_error t buf
          )
     )
