@@ -12,7 +12,26 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+setup-clean: clean distclean
+	oasis setup-clean
+	$(RM) setup.* _tags configure myocamlbuild.ml
+	$(RM) lib/META lib/*.ml*lib lib/*.mlpack
+
+setup.ml: _oasis
+	oasis setup
+
+setup: setup.ml setup.data
+
+
+clean:
+	$(SETUP) -clean $(CLEANFLAGS)
+	[ -r bin/Makefile ] && mirage clean bin/config.ml
+	$(RM) log
+
+
 lib: build reinstall
+	[ ! -r bin/Makefile ] && mirage configure --no-depext bin/config.ml || true
+	mirage clean bin/config.ml
 
 configure:
 	mirage configure bin/config.ml
@@ -20,19 +39,3 @@ configure:
 tftpd:
 	[ ! -r bin/Makefile ] && mirage configure --no-depext bin/config.ml || true
 	mirage build bin/config.ml
-
-clean:
-	$(SETUP) -clean $(CLEANFLAGS)
-	[ -r bin/Makefile ] && mirage clean bin/config.ml
-
-distclean:
-	$(RM) lib/META lib/*.ml*lib lib/*.mlpack
-
-
-setup-clean: distclean
-	oasis setup-clean
-
-setup.ml: _oasis
-	oasis setup
-
-setup: setup.ml setup.data
