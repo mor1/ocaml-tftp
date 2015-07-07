@@ -17,7 +17,7 @@
 open Cstruct
 
 cenum errorcode {
-    UNDEF = 0;
+    UNDEFINED = 0;
     FILE_NOT_FOUND;
     ACCESS_VIOLATION;
     DISK_FULL;
