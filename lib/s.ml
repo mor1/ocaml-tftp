@@ -109,11 +109,10 @@ module Make(C:V1_LWT.CONSOLE)(FS:V1_LWT.KV_RO)(U:V1_LWT.UDPV4) = struct
           | `Error (FS.Unknown_key s) -> error t (sp "read! unknown key %s" s)
           | `Ok pages ->
             let data = Cstruct.(pages |> copyv |> of_string) in
-            let loc_port = source_port + 1 in
-            Hashtbl.replace t.tids (sip,spt) loc_port;
-            let tid = (sip,spt, loc_port) in
+            let tid = (sip,spt, source_port) in
             Hashtbl.replace t.files filename data;
             Hashtbl.replace t.conns tid (filename, filesize, 0L);
+            Hashtbl.replace t.tids (sip,spt) (source_port + 1);
             Lwt.return tid
         )
 
