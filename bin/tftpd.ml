@@ -23,8 +23,8 @@ module Main (C: CONSOLE) (FS: KV_RO) (S: STACKV4) = struct
   module T = Tftp.S.Make(C)(FS)(U)
 
   let start c fs s =
-    let callback = T.(make ~c ~fs ~u:(S.udpv4 s) () |> callback) in
-    S.listen_udpv4 s ~port:(T.default_port) callback;
+    let t = T.make ~c ~fs ~u:(S.udpv4 s) () in
+    S.listen_udpv4 s ~port:t.T.port (T.callback t);
     S.listen s
 
 end
