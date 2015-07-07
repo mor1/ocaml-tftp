@@ -30,31 +30,32 @@ module Hashtbl = struct
 
 end
 
-module Make(C:V1_LWT.CONSOLE)(FS:V1_LWT.KV_RO)(U:V1_LWT.UDPV4) = struct
+module Make(C:V1_LWT.CONSOLE)(FS:V1_LWT.KV_RO)(S:V1_LWT.STACKV4) = struct
+
+  module U = S.UDPV4
 
   type tid = U.ipaddr * int * int
   let tid_to_string (rip,rpt, lpt) =
     sp "(%s,%d, %d)" (Ipaddr.V4.to_string rip) rpt lpt
 
   type t = {
-    port: int;
     c: C.t;
     fs: FS.t;
-    u: U.t;
+    s: S.t;
 
+    conns: (tid, string * int64 * int64) Hashtbl.t;
     tids: (U.ipaddr * int, int) Hashtbl.t;
     files: (string, Cstruct.t) Hashtbl.t;
-    conns: (tid, string * int64 * int64) Hashtbl.t;
   }
 
   let default_port = 69
   let min_port = 32768
 
-  let make ?(port=default_port) ~c ~fs ~u () =
+  let make ~c ~fs ~s () =
     let conns = Hashtbl.create 16 in
     let tids = Hashtbl.create 16 in
     let files = Hashtbl.create 16 in
-    { port; c; fs; u; conns; tids; files }
+    { c; fs; s; conns; tids; files }
 
   let error { c; _ } msg =
     let msg = sp "ERROR: %s" msg in
@@ -84,7 +85,7 @@ module Make(C:V1_LWT.CONSOLE)(FS:V1_LWT.KV_RO)(U:V1_LWT.UDPV4) = struct
         Cstruct.blit
           data (Int64.to_int srcoff) obuf Wire.sizeof_hdat datlen;
         let (dest_ip, dest_port, source_port) = tid in
-        U.write ~source_port ~dest_ip ~dest_port t.u obuf
+        U.write ~source_port ~dest_ip ~dest_port (S.udpv4 t.s) obuf
 
   (** *)
 
@@ -101,8 +102,10 @@ module Make(C:V1_LWT.CONSOLE)(FS:V1_LWT.KV_RO)(U:V1_LWT.UDPV4) = struct
     >>= fun filesize ->
     Hashtbl.get t.tids ~default:min_port (sip,spt)
     |> function
-    | None -> C.log_s t.c (sp "rrq! failed to get tid (%s,%d)"
-                             (Ipaddr.V4.to_string sip) spt)
+    | None ->
+      C.log t.c (sp "rrq! failed to get tid (%s,%d)"
+                   (Ipaddr.V4.to_string sip) spt);
+      Lwt.return_none
 
     | Some source_port ->
       FS.read t.fs filename 0 (Int64.to_int filesize) >>= (function
@@ -115,9 +118,9 @@ module Make(C:V1_LWT.CONSOLE)(FS:V1_LWT.KV_RO)(U:V1_LWT.UDPV4) = struct
             Hashtbl.replace t.tids (sip,spt) (source_port + 1);
             Lwt.return tid
         )
-
-      >>= fun tid ->
-      tx_datap ~t ~tid filename
+      >>= fun tid -> tx_datap ~t ~tid filename
+      >>= fun () ->
+      Lwt.return (Some tid)
 
   let handle_ack t ((sip,spt), (dip,dpt)) buf =
     let tid = (sip, spt, dpt) in
@@ -151,8 +154,9 @@ module Make(C:V1_LWT.CONSOLE)(FS:V1_LWT.KV_RO)(U:V1_LWT.UDPV4) = struct
   let unhandled { c; _ } opcode =
     C.log_s c (sp "%s unhandled!" (Wire.opcode_to_string opcode))
 
-  let callback t =
-    let { port; c; _ } = t in
+
+  let rec callback port t =
+    let { c; _ } = t in
     C.log c "Tftp: starting";
     (fun ~src ~dst ~src_port buf ->
        C.log c
@@ -164,11 +168,19 @@ module Make(C:V1_LWT.CONSOLE)(FS:V1_LWT.KV_RO)(U:V1_LWT.UDPV4) = struct
        Wire.(buf |> get_hreq_opcode |> int_to_opcode |> function
          | None -> error t (Cstruct.debug buf)
          | Some o -> match o with
-           | RRQ -> handle_rrq t ((src,src_port), (dst,t.port)) buf
-           | ACK -> handle_ack t ((src,src_port), (dst,t.port)) buf
+           | RRQ -> (
+               handle_rrq t ((src,src_port), (dst,port)) buf
+               >>= function
+               | None -> Lwt.return_unit
+               | Some (_rip,_rpt, port)  ->
+                 S.listen_udpv4 t.s ~port (callback port t);
+                 Lwt.return_unit
+             )
+           | ACK -> handle_ack t ((src,src_port), (dst,port)) buf
            | ERROR -> handle_error t buf
            | WRQ | DATA -> unhandled t o
          )
     )
+
 
 end

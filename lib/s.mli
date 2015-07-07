@@ -14,17 +14,16 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *)
 
-open Lwt
-open V1_LWT
+open Mirage
 
-module Main (C: CONSOLE) (FS: KV_RO) (S: STACKV4) = struct
+module Make(C:V1_LWT.CONSOLE)(FS:V1_LWT.KV_RO)(S:V1_LWT.STACKV4) : sig
 
-  module T = Tftp.S.Make(C)(FS)(S)
+  type t
 
-  let start c fs s =
-    let t = T.make ~c ~fs ~s () in
-    let port = T.default_port in
-    S.listen_udpv4 s ~port (T.callback port t);
-    S.listen s
+  val default_port: int
+
+  val make: c:C.t -> fs:FS.t -> s:S.t -> unit -> t
+
+  val callback: int -> t -> S.UDPV4.callback
 
 end
