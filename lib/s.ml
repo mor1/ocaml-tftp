@@ -14,11 +14,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *)
 
-(* XXX sort out logging *)
-(* XXX remove installed callbacks on final ACK *)
-(* XXX add options support: blocksize, timeout, xfer size, window size *)
-(* XXX ensure strings in (eg) error packets are valid NETASCII *)
-
 open Lwt.Infix
 
 let sp = Printf.sprintf
