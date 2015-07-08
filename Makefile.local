@@ -61,3 +61,22 @@ gh-pages: doc/html/.git
 		git commit -a -m "Documentation updates" && \
 		git push origin gh-pages \
 	)
+
+## Release targets
+
+VERSION = $(shell grep 'Version:' _oasis | sed 's/Version: *//')
+NAME    = $(shell grep 'Name:' _oasis    | sed 's/Name: *//')
+ARCHIVE = https://github.com/mor1/ocaml-tftp/archive/$(VERSION).tar.gz
+
+opam: release publish pr
+
+release:
+	git tag -a $(VERSION) -m "Version $(VERSION)."
+	git push upstream $(VERSION)
+
+publish:
+	opam publish prepare $(NAME).$(VERSION) $(ARCHIVE)
+
+pr:
+	OPAMPUBLISHBYPASSCHECKS=1 OPAMYES=1 \
+		opam publish submit $(NAME).$(VERSION) && rm -rf $(NAME).$(VERSION)
