@@ -58,7 +58,7 @@ doc/html/.git:
 gh-pages: doc/html/.git
 	cd doc/html && git checkout -B gh-pages
 	rm -f doc/html/*
-	cp tftp.docdir/* doc/html/
+	$(MAKE) doc && cp tftp.docdir/* doc/html/
 	cd doc/html && ( \
 		git add * && \
 		git commit -a -m "Documentation updates" && \
