@@ -1,0 +1,33 @@
+opam-version: "1.2"
+name:         "tftp"
+version:      "0.1.0"
+maintainer:   "mort@cantab.net"
+authors:      "Richard Mortier <mort@cantab.net>"
+homepage:     "https://github.com/mor1/ocaml-tftp"
+bug-reports:  "https://github.com/mor1/ocaml-tftp/issues"
+license:      "ISC"
+dev-repo:     "https://github.com/mor1/ocaml-tftp.git"
+
+build: [
+  ["./configure" "--prefix=%{prefix}%" "--%{alcotest:enable}%-tests"]
+  [make]
+]
+
+install: [make "install"]
+
+build-test: [make "test"]
+
+remove: [
+  ["ocamlfind" "remove" "tftp"]
+  ["rm" "-f" "%{bin}%/tftp[dc]"]
+]
+
+depends: [
+  "lwt" {>= "2.4.7"}
+  "cstruct" {>= "1.0.1"}
+  "cmdliner"
+  "crunch"
+  "alcotest" {test}
+]
+
+available: [ocaml-version >= "4.01.0"]
