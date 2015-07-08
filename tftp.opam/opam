@@ -8,7 +8,9 @@ dev-repo:     "https://github.com/mor1/ocaml-tftp.git"
 
 build: [
   ["./configure" "--prefix=%{prefix}%" "--%{alcotest:enable}%-tests"]
-  [make]
+  [make "build"]
+  [make "tftpd" "FS=direct" "NET=socket"]
+  ["cp" "./tftp.opam/install" "./tftp.install"]
 ]
 
 install: [make "install"]

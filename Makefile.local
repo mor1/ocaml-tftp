@@ -28,8 +28,8 @@ setup: setup.ml setup.data
 
 clean:
 	$(SETUP) -clean $(CLEANFLAGS)
-	[ -r bin/Makefile ] && mirage clean bin/config.ml
-	$(RM) log
+	[ -r bin/Makefile ] && mirage clean bin/config.ml || true
+	$(RM) log bin/tftpd
 
 lib: build reinstall
 	[ ! -r bin/Makefile ] && mirage configure --no-depext bin/config.ml || true
@@ -38,9 +38,12 @@ lib: build reinstall
 configure:
 	mirage configure bin/config.ml
 
-tftpd:
-	[ ! -r bin/Makefile ] && mirage configure --no-depext bin/config.ml || true
+tftpd: bin/tftpd
+bin/tftpd: bin/config.ml bin/tftpd.ml
+	[ ! -r bin/Makefile ] && \
+		mirage configure --no-depext --unix bin/config.ml || true
 	mirage build bin/config.ml
+	cp bin/_build/main.native bin/tftpd
 
 ## Documentation
 
