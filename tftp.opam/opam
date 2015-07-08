@@ -21,6 +21,7 @@ remove: [
 
 depends: [
   "ocamlfind" {build}
+  "camlp4"
   "lwt"       {>= "2.4.7"}
   "cstruct"   {>= "1.0.1"}
   "mirage"    {>= "2.5.0"}
