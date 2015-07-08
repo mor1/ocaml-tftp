@@ -1,0 +1,28 @@
+# OASIS_START
+# DO NOT EDIT (digest: cc840fe2d9eeadcf79ff9136f2f19898)
+# Ignore VCS directories, you can use the same kind of rule outside
+# OASIS_START/STOP if you want to exclude directories that contains
+# useless stuff for the build process
+true: annot, bin_annot
+<**/.svn>: -traverse
+<**/.svn>: not_hygienic
+".bzr": -traverse
+".bzr": not_hygienic
+".hg": -traverse
+".hg": not_hygienic
+".git": -traverse
+".git": not_hygienic
+"_darcs": -traverse
+"_darcs": not_hygienic
+# Library tftp-wire
+"lib/tftp-wire.cmxs": use_tftp-wire
+# Library tftp
+"lib/tftp.cmxs": use_tftp
+"lib/s.cmx": for-pack(Tftp)
+<lib/*.ml{,i,y}>: pkg_cstruct
+<lib/*.ml{,i,y}>: pkg_cstruct.syntax
+<lib/*.ml{,i,y}>: pkg_io-page
+<lib/*.ml{,i,y}>: pkg_lwt
+<lib/*.ml{,i,y}>: pkg_mirage
+<lib/*.ml{,i,y}>: use_tftp-wire
+# OASIS_STOP
