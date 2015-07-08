@@ -191,7 +191,7 @@ module Make(C:V1_LWT.CONSOLE)(FS:V1_LWT.KV_RO)(S:V1_LWT.STACKV4) = struct
     C.log t.c (sp "%s unhandled!" (Wire.opcode_to_string opcode));
     tx_errp ~t ~tid Wire.ILLEGAL_OP (Wire.opcode_to_string opcode)
 
-  let rec callback port t =
+  let rec callback ~port t =
     let { c; _ } = t in
     C.log c "Tftp: starting";
     (fun ~src ~dst ~src_port buf ->
@@ -208,7 +208,7 @@ module Make(C:V1_LWT.CONSOLE)(FS:V1_LWT.KV_RO)(S:V1_LWT.STACKV4) = struct
                >>= function
                | None -> Lwt.return_unit
                | Some (_rip,_rpt, port)  ->
-                 S.listen_udpv4 t.s ~port (callback port t);
+                 S.listen_udpv4 t.s ~port (callback ~port t);
                  Lwt.return_unit
              )
            | ACK -> handle_ack t (src,src_port, port) buf

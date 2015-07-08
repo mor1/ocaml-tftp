@@ -24,7 +24,7 @@ module Main (C: CONSOLE) (FS: KV_RO) (S: STACKV4) = struct
   let start c fs s =
     let t = T.make ~c ~fs ~s () in
     let port = T.default_port in
-    S.listen_udpv4 s ~port (T.callback port t);
+    S.listen_udpv4 s ~port (T.callback ~port t);
     S.listen s
 
 end
