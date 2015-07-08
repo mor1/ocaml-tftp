@@ -78,5 +78,5 @@ publish:
 	opam publish prepare $(NAME).$(VERSION) $(ARCHIVE)
 
 pr:
-	OPAMPUBLISHBYPASSCHECKS=1 OPAMYES=1 \
-		opam publish submit $(NAME).$(VERSION) && rm -rf $(NAME).$(VERSION)
+	opam publish submit $(NAME).$(VERSION)
+	$(RM) -r $(NAME).$(VERSION)
