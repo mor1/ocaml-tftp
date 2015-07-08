@@ -1,6 +1,6 @@
 OASISFormat: 0.4
 Name:        tftp
-Version:     0.1.0
+Version:     0.1.1
 Synopsis:    Trivial FTP
 Authors:     Richard Mortier
 License:     ISC
