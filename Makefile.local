@@ -38,7 +38,7 @@ lib: build reinstall
 tftpd: bin/tftpd
 bin/tftpd: bin/config.ml bin/tftpd.ml
 	[ ! -r bin/Makefile ] && \
-		mirage configure --no-depext --unix bin/config.ml || true
+		mirage configure --unix bin/config.ml || true
 	mirage build bin/config.ml
 	cp bin/_build/main.native bin/tftpd
 
