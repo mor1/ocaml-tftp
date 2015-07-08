@@ -17,15 +17,14 @@ build-test: [make "test"]
 
 remove: [
   ["ocamlfind" "remove" "tftp"]
-  ["rm" "-f" "%{bin}%/tftp[dc]"]
 ]
 
 depends: [
-  "lwt" {>= "2.4.7"}
-  "cstruct" {>= "1.0.1"}
-  "cmdliner"
-  "crunch"
-  "alcotest" {test}
+  "ocamlfind" {build}
+  "lwt"       {>= "2.4.7"}
+  "cstruct"   {>= "1.0.1"}
+  "mirage"    {>= "2.5.0"}
+  "io-page"
 ]
 
 available: [ocaml-version >= "4.01.0"]
