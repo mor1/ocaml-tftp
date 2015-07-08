@@ -1,5 +1,7 @@
 # A Trivial FTP Server
 
+Documentation at <http://mor1.github.io/ocaml-tftp/>.
+
 ## Testing on OSX
 
 Following
