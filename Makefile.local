@@ -64,8 +64,8 @@ gh-pages: doc/html/.git
 
 ## Release targets
 
-VERSION = $(shell grep 'Version:' _oasis | sed 's/Version: *//')
-NAME    = $(shell grep 'Name:' _oasis    | sed 's/Name: *//')
+VERSION = $(shell grep '^Version:' _oasis | sed 's/Version: *//')
+NAME    = $(shell grep '^Name:' _oasis    | sed 's/Name: *//')
 ARCHIVE = https://github.com/mor1/ocaml-tftp/archive/$(VERSION).tar.gz
 
 opam: release publish pr
