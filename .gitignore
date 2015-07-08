@@ -31,7 +31,11 @@ _tags
 /bin/Makefile
 /bin/main.ml
 
-# Directory containing contents for servingbin: add merlin
+# Directory containing contents for serving
 /bin/data
 /bin/static*.ml*
+
+# OCaml/OPAM droppings
 doc/**
+tftp.*/
+-tftp.opam/

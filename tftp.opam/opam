@@ -1,6 +1,4 @@
 opam-version: "1.2"
-name:         "tftp"
-version:      "0.1.0"
 maintainer:   "mort@cantab.net"
 authors:      "Richard Mortier <mort@cantab.net>"
 homepage:     "https://github.com/mor1/ocaml-tftp"
