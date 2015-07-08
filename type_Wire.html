@@ -1,0 +1,51 @@
+<html><head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Wire" rel="Chapter" href="Wire.html">
+<link title="S" rel="Chapter" href="S.html"><title>Wire</title>
+</head>
+<body>
+<code class="code"><span class="keyword">sig</span><br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;errorcode&nbsp;=<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">UNDEFINED</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">FILE_NOT_FOUND</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">ACCESS_VIOLATION</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">DISK_FULL</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">ILLEGAL_OP</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">UNKNOWN_TID</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">FILE_EXISTS</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">UNKNOWN_USER</span><br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;int_to_errorcode&nbsp;:&nbsp;int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Wire</span>.errorcode&nbsp;option<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;errorcode_to_int&nbsp;:&nbsp;<span class="constructor">Wire</span>.errorcode&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;int<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;errorcode_to_string&nbsp;:&nbsp;<span class="constructor">Wire</span>.errorcode&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;string<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;string_to_errorcode&nbsp;:&nbsp;string&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Wire</span>.errorcode&nbsp;option<br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;opcode&nbsp;=&nbsp;<span class="constructor">RRQ</span>&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">WRQ</span>&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">DATA</span>&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">ACK</span>&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">ERROR</span><br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;int_to_opcode&nbsp;:&nbsp;int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Wire</span>.opcode&nbsp;option<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;opcode_to_int&nbsp;:&nbsp;<span class="constructor">Wire</span>.opcode&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;int<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;opcode_to_string&nbsp;:&nbsp;<span class="constructor">Wire</span>.opcode&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;string<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;string_to_opcode&nbsp;:&nbsp;string&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Wire</span>.opcode&nbsp;option<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;sizeof_hreq&nbsp;:&nbsp;int<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;get_hreq_opcode&nbsp;:&nbsp;<span class="constructor">Cstruct</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Cstruct</span>.uint16<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;set_hreq_opcode&nbsp;:&nbsp;<span class="constructor">Cstruct</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Cstruct</span>.uint16&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;hexdump_hreq_to_buffer&nbsp;:&nbsp;<span class="constructor">Buffer</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Cstruct</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;hexdump_hreq&nbsp;:&nbsp;<span class="constructor">Cstruct</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;sizeof_hdat&nbsp;:&nbsp;int<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;get_hdat_opcode&nbsp;:&nbsp;<span class="constructor">Cstruct</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Cstruct</span>.uint16<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;set_hdat_opcode&nbsp;:&nbsp;<span class="constructor">Cstruct</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Cstruct</span>.uint16&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;get_hdat_blockno&nbsp;:&nbsp;<span class="constructor">Cstruct</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Cstruct</span>.uint16<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;set_hdat_blockno&nbsp;:&nbsp;<span class="constructor">Cstruct</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Cstruct</span>.uint16&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;hexdump_hdat_to_buffer&nbsp;:&nbsp;<span class="constructor">Buffer</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Cstruct</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;hexdump_hdat&nbsp;:&nbsp;<span class="constructor">Cstruct</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;sizeof_herr&nbsp;:&nbsp;int<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;get_herr_opcode&nbsp;:&nbsp;<span class="constructor">Cstruct</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Cstruct</span>.uint16<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;set_herr_opcode&nbsp;:&nbsp;<span class="constructor">Cstruct</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Cstruct</span>.uint16&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;get_herr_errorcode&nbsp;:&nbsp;<span class="constructor">Cstruct</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Cstruct</span>.uint16<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;set_herr_errorcode&nbsp;:&nbsp;<span class="constructor">Cstruct</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Cstruct</span>.uint16&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;hexdump_herr_to_buffer&nbsp;:&nbsp;<span class="constructor">Buffer</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Cstruct</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;hexdump_herr&nbsp;:&nbsp;<span class="constructor">Cstruct</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;string0&nbsp;:&nbsp;<span class="constructor">Cstruct</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;string&nbsp;*&nbsp;<span class="constructor">Cstruct</span>.t<br>
+<span class="keyword">end</span></code></body></html>

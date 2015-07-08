@@ -1,0 +1,21 @@
+<html><head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Wire" rel="Chapter" href="Wire.html">
+<link title="S" rel="Chapter" href="S.html"><title>S</title>
+</head>
+<body>
+<code class="code"><span class="keyword">sig</span><br>
+&nbsp;&nbsp;<span class="keyword">module</span>&nbsp;<span class="constructor">Make</span>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">functor</span>&nbsp;(<span class="constructor">C</span>&nbsp;:&nbsp;<span class="constructor">V1_LWT</span>.<span class="constructor">CONSOLE</span>)&nbsp;(<span class="constructor">FS</span>&nbsp;:&nbsp;<span class="constructor">V1_LWT</span>.<span class="constructor">KV_RO</span>)&nbsp;(<span class="constructor">S</span>&nbsp;:&nbsp;<span class="constructor">V1_LWT</span>.<span class="constructor">STACKV4</span>)&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">sig</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;t<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;make&nbsp;:&nbsp;c:<span class="constructor">C</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;fs:<span class="constructor">FS</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;s:<span class="constructor">S</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">S</span>.<span class="constructor">Make</span>.t<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;default_port&nbsp;:&nbsp;int<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;callback&nbsp;:&nbsp;port:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">S</span>.<span class="constructor">Make</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">S</span>.<span class="constructor">UDPV4</span>.callback<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">end</span><br>
+<span class="keyword">end</span></code></body></html>

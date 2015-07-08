@@ -1,0 +1,202 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="next" href="S.html">
+<link rel="Up" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Wire" rel="Chapter" href="Wire.html">
+<link title="S" rel="Chapter" href="S.html"><link title="TFTP error codes" rel="Section" href="#2_TFTPerrorcodes">
+<link title="TFTP opcodes" rel="Section" href="#2_TFTPopcodes">
+<link title="Request packets, Wire.opcode.RRQ/Wire.opcode.WRQ" rel="Section" href="#2_RequestpacketsWireopcodeRRQWireopcodeWRQ">
+<link title="Data packets, Wire.opcode.DATA/Wire.opcode.ACK" rel="Section" href="#2_DatapacketsWireopcodeDATAWireopcodeACK">
+<link title="Error packets, Wire.opcode.ERROR" rel="Section" href="#2_ErrorpacketsWireopcodeERROR">
+<link title="Utility functions" rel="Section" href="#2_Utilityfunctions">
+<title>Wire</title>
+</head>
+<body>
+<div class="navbar">&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;<a class="post" href="S.html" title="S">Next</a>
+</div>
+<h1>Module <a href="type_Wire.html">Wire</a></h1>
+
+<pre><span class="keyword">module</span> Wire: <code class="code">sig</code> <a href="Wire.html">..</a> <code class="code">end</code></pre><div class="info module top">
+<h1 id="1_TFTPwireparsers">TFTP wire parsers</h1><br>
+</div>
+<hr width="100%">
+<br>
+<h2 id="2_TFTPerrorcodes">TFTP error codes</h2><br>
+
+<pre><code><span id="TYPEerrorcode"><span class="keyword">type</span> <code class="type"></code>errorcode</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTerrorcode.UNDEFINED"><span class="constructor">UNDEFINED</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+operation undefined, e.g., couldn't create <code class="code">TID</code><br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTerrorcode.FILE_NOT_FOUND"><span class="constructor">FILE_NOT_FOUND</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+file not found in store<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTerrorcode.ACCESS_VIOLATION"><span class="constructor">ACCESS_VIOLATION</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTerrorcode.DISK_FULL"><span class="constructor">DISK_FULL</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTerrorcode.ILLEGAL_OP"><span class="constructor">ILLEGAL_OP</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+unsupported operation, e.g., unsupported <code class="code">mode</code><br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTerrorcode.UNKNOWN_TID"><span class="constructor">UNKNOWN_TID</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTerrorcode.FILE_EXISTS"><span class="constructor">FILE_EXISTS</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTerrorcode.UNKNOWN_USER"><span class="constructor">UNKNOWN_USER</span></span></code></td>
+
+</tr></table>
+
+
+<br>
+Conversion to/from <a href="Wire.html#TYPEerrorcode"><code class="code">Wire.errorcode</code></a>s.<br>
+
+<pre><span id="VALint_to_errorcode"><span class="keyword">val</span> int_to_errorcode</span> : <code class="type">int -> <a href="Wire.html#TYPEerrorcode">errorcode</a> option</code></pre>
+<pre><span id="VALerrorcode_to_int"><span class="keyword">val</span> errorcode_to_int</span> : <code class="type"><a href="Wire.html#TYPEerrorcode">errorcode</a> -> int</code></pre>
+<pre><span id="VALerrorcode_to_string"><span class="keyword">val</span> errorcode_to_string</span> : <code class="type"><a href="Wire.html#TYPEerrorcode">errorcode</a> -> string</code></pre>
+<pre><span id="VALstring_to_errorcode"><span class="keyword">val</span> string_to_errorcode</span> : <code class="type">string -> <a href="Wire.html#TYPEerrorcode">errorcode</a> option</code></pre><br>
+<h2 id="2_TFTPopcodes">TFTP opcodes</h2><br>
+
+<pre><code><span id="TYPEopcode"><span class="keyword">type</span> <code class="type"></code>opcode</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTopcode.RRQ"><span class="constructor">RRQ</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+read request<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTopcode.WRQ"><span class="constructor">WRQ</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+write request<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTopcode.DATA"><span class="constructor">DATA</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+data block<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTopcode.ACK"><span class="constructor">ACK</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+acknowledgement<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTopcode.ERROR"><span class="constructor">ERROR</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+error indication<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr></table>
+
+
+<br>
+Conversion to/from <a href="Wire.html#TYPEopcode"><code class="code">Wire.opcode</code></a>s.<br>
+
+<pre><span id="VALint_to_opcode"><span class="keyword">val</span> int_to_opcode</span> : <code class="type">int -> <a href="Wire.html#TYPEopcode">opcode</a> option</code></pre>
+<pre><span id="VALopcode_to_int"><span class="keyword">val</span> opcode_to_int</span> : <code class="type"><a href="Wire.html#TYPEopcode">opcode</a> -> int</code></pre>
+<pre><span id="VALopcode_to_string"><span class="keyword">val</span> opcode_to_string</span> : <code class="type"><a href="Wire.html#TYPEopcode">opcode</a> -> string</code></pre>
+<pre><span id="VALstring_to_opcode"><span class="keyword">val</span> string_to_opcode</span> : <code class="type">string -> <a href="Wire.html#TYPEopcode">opcode</a> option</code></pre><br>
+<h2 id="2_RequestpacketsWireopcodeRRQWireopcodeWRQ">Request packets, <a href="Wire.html#TYPEELTopcode.RRQ"><code class="code">Wire.opcode.RRQ</code></a>/<a href="Wire.html#TYPEELTopcode.WRQ"><code class="code">Wire.opcode.WRQ</code></a></h2><br>
+
+<pre><span id="VALsizeof_hreq"><span class="keyword">val</span> sizeof_hreq</span> : <code class="type">int</code></pre>
+<pre><span id="VALget_hreq_opcode"><span class="keyword">val</span> get_hreq_opcode</span> : <code class="type">Cstruct.t -> Cstruct.uint16</code></pre>
+<pre><span id="VALset_hreq_opcode"><span class="keyword">val</span> set_hreq_opcode</span> : <code class="type">Cstruct.t -> Cstruct.uint16 -> unit</code></pre>
+<pre><span id="VALhexdump_hreq_to_buffer"><span class="keyword">val</span> hexdump_hreq_to_buffer</span> : <code class="type">Buffer.t -> Cstruct.t -> unit</code></pre>
+<pre><span id="VALhexdump_hreq"><span class="keyword">val</span> hexdump_hreq</span> : <code class="type">Cstruct.t -> unit</code></pre><br>
+<h2 id="2_DatapacketsWireopcodeDATAWireopcodeACK">Data packets, <a href="Wire.html#TYPEELTopcode.DATA"><code class="code">Wire.opcode.DATA</code></a>/<a href="Wire.html#TYPEELTopcode.ACK"><code class="code">Wire.opcode.ACK</code></a></h2><br>
+
+<pre><span id="VALsizeof_hdat"><span class="keyword">val</span> sizeof_hdat</span> : <code class="type">int</code></pre>
+<pre><span id="VALget_hdat_opcode"><span class="keyword">val</span> get_hdat_opcode</span> : <code class="type">Cstruct.t -> Cstruct.uint16</code></pre>
+<pre><span id="VALset_hdat_opcode"><span class="keyword">val</span> set_hdat_opcode</span> : <code class="type">Cstruct.t -> Cstruct.uint16 -> unit</code></pre>
+<pre><span id="VALget_hdat_blockno"><span class="keyword">val</span> get_hdat_blockno</span> : <code class="type">Cstruct.t -> Cstruct.uint16</code></pre>
+<pre><span id="VALset_hdat_blockno"><span class="keyword">val</span> set_hdat_blockno</span> : <code class="type">Cstruct.t -> Cstruct.uint16 -> unit</code></pre>
+<pre><span id="VALhexdump_hdat_to_buffer"><span class="keyword">val</span> hexdump_hdat_to_buffer</span> : <code class="type">Buffer.t -> Cstruct.t -> unit</code></pre>
+<pre><span id="VALhexdump_hdat"><span class="keyword">val</span> hexdump_hdat</span> : <code class="type">Cstruct.t -> unit</code></pre><br>
+<h2 id="2_ErrorpacketsWireopcodeERROR">Error packets, <a href="Wire.html#TYPEELTopcode.ERROR"><code class="code">Wire.opcode.ERROR</code></a></h2><br>
+
+<pre><span id="VALsizeof_herr"><span class="keyword">val</span> sizeof_herr</span> : <code class="type">int</code></pre>
+<pre><span id="VALget_herr_opcode"><span class="keyword">val</span> get_herr_opcode</span> : <code class="type">Cstruct.t -> Cstruct.uint16</code></pre>
+<pre><span id="VALset_herr_opcode"><span class="keyword">val</span> set_herr_opcode</span> : <code class="type">Cstruct.t -> Cstruct.uint16 -> unit</code></pre>
+<pre><span id="VALget_herr_errorcode"><span class="keyword">val</span> get_herr_errorcode</span> : <code class="type">Cstruct.t -> Cstruct.uint16</code></pre>
+<pre><span id="VALset_herr_errorcode"><span class="keyword">val</span> set_herr_errorcode</span> : <code class="type">Cstruct.t -> Cstruct.uint16 -> unit</code></pre>
+<pre><span id="VALhexdump_herr_to_buffer"><span class="keyword">val</span> hexdump_herr_to_buffer</span> : <code class="type">Buffer.t -> Cstruct.t -> unit</code></pre>
+<pre><span id="VALhexdump_herr"><span class="keyword">val</span> hexdump_herr</span> : <code class="type">Cstruct.t -> unit</code></pre><br>
+<h2 id="2_Utilityfunctions">Utility functions</h2><br>
+
+<pre><span id="VALstring0"><span class="keyword">val</span> string0</span> : <code class="type">Cstruct.t -> string * Cstruct.t</code></pre><div class="info ">
+<code class="code">string0 buf</code> extracts a <code class="code">NUL</code> terminated ASCII string from <code class="code">buf</code>, shifts
+    <code class="code">buf</code> past it, and returns the pair.<br>
+</div>
+</body></html>
