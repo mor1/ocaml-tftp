@@ -28,22 +28,3 @@ Document tftp
   Install:              true
   XOCamlbuildPath:      lib/
   XOCamlbuildLibraries: tftp.wire, tftp
-
-# Executable tftp
-#   Path:           bin/
-#   MainIs:         tftp.ml
-#   CompiledObject: best
-#   BuildDepends:   cmdliner, tftp
-
-# Executable test_tftp
-#   Path:           lib_test
-#   MainIs:         test.ml
-#   Build$:         flag(tests) && flag(unix)
-#   CompiledObject: best
-#   Install:        false
-#   BuildDepends:   tftp, alcotest
-
-# Test test_tftp
-#   Run$:             flag(tests) && flag(unix)
-#   Command:          $test_tftp -q
-#   WorkingDirectory: lib_test
