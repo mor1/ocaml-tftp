@@ -21,13 +21,13 @@ Library "tftp"
   Modules:      S
   BuildDepends: mirage, lwt, tftp.wire, io-page
 
-# Document tftp
-#   Title:                TFTP docs
-#   Type:                 OCamlbuild (0.4)
-#   BuildTools+:          ocamldoc
-#   Install:              true
-#   XOCamlbuildPath:      lib/
-#   XOCamlbuildLibraries: tftp
+Document tftp
+  Title:                TFTP docs
+  Type:                 OCamlbuild (0.4)
+  BuildTools+:          ocamldoc
+  Install:              true
+  XOCamlbuildPath:      lib/
+  XOCamlbuildLibraries: tftp.wire, tftp
 
 # Executable tftp
 #   Path:           bin/
