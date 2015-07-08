@@ -19,7 +19,6 @@ To change the served directory from the default of `/private/tftpboot`, edit the
 + Add options support: blocksize, timeout, xfer size, window size
 + Ensure strings in (eg) error packets are valid NETASCII
 + Add some testing goodness
-+ `.mli` documentation
 + Requirements traceability using <https://github.com/infidel/reqtrace>
 + Write a client
 + Add Travis
