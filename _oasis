@@ -1,25 +1,32 @@
 OASISFormat: 0.4
 Name:        tftp
 Version:     0.1.3
-Synopsis:    Trivial FTP
+Synopsis:    A TFTP library and Mirage unikernel
+Description: A basic implementation of the
+  [Trivial FTP](https://tools.ietf.org/html/rfc1350)
+  protocol. Provides separate wire parsing and server libraries, plus a
+  [MirageOS](https://mirage.io/) unikernel server implementation.
 Authors:     Richard Mortier
+Maintainers: Richard Mortier <mort@cantab.net>
+Homepage:    https://github.com/mor1/ocaml-tftp
 License:     ISC
 Plugins:     META (0.4), DevFiles (0.4)
 BuildTools:  ocamlbuild
+OCamlVersion: >= 4.01.0
 
 Library "tftp-wire"
   Path:          lib/
   FindlibName:   wire
   FindlibParent: tftp
   Modules:       Wire
-  BuildDepends:  cstruct, cstruct.syntax
+  BuildDepends:  cstruct (>= 1.0.1), cstruct.syntax
 
 Library "tftp"
   Path:         lib/
   Pack:         true
   Findlibname:  tftp
   Modules:      S
-  BuildDepends: mirage, lwt, tftp.wire, io-page
+  BuildDepends: mirage (>= 2.5.0), lwt (>= 2.4.7), tftp.wire, io-page
 
 Document tftp
   Title:                TFTP docs
@@ -28,3 +35,9 @@ Document tftp
   Install:              true
   XOCamlbuildPath:      lib/
   XOCamlbuildLibraries: tftp.wire, tftp
+
+
+SourceRepository master
+  Type:     git
+  Location: https://github.com/mor1/ocaml-tftp.git
+  Browser:  https://github.com/mor1/ocaml-tftp
