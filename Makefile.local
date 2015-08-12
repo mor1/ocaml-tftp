@@ -32,15 +32,13 @@ clean:
 	$(RM) log bin/tftpd
 
 lib: build reinstall
-	[ ! -r bin/Makefile ] && mirage configure --no-depext bin/config.ml || true
-	mirage clean bin/config.ml
 
 tftpd: bin/tftpd
-bin/tftpd: bin/config.ml bin/tftpd.ml
-	[ ! -r bin/Makefile ] && \
-		mirage configure --unix bin/config.ml || true
+bin/tftpd: bin/Makefile bin/tftpd.ml
 	mirage build bin/config.ml
 	cp bin/_build/main.native bin/tftpd
+bin/Makefile: bin/config.ml
+	mirage configure --unix bin/config.ml $(MIRFLAGS)
 
 ## Documentation
 
