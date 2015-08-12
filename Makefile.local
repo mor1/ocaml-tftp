@@ -79,3 +79,12 @@ publish:
 pr:
 	OPAMYES=1 opam pin add -n $(NAME) $(NAME).$(VERSION)
 	opam publish submit $(NAME).$(VERSION) && $(RM) -r $(NAME).$(VERSION)
+
+test-opam:
+	opam switch system
+	opam switch remove test-opam -y
+	opam switch test-opam -A system -y
+	eval $$(opam config env)
+	opam pin add tftp . -k git -y
+	opam switch system
+	eval $$(opam config env)
