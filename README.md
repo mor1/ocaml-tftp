@@ -19,21 +19,14 @@ To change the served directory from the default of `/private/tftpboot`, edit the
 ## TODO
 
 + Sort out logging
-
 + Remove installed callbacks on final ACK
-
 + Add options support: <https://tools.ietf.org/html/rfc2347>
   + blocksize <https://tools.ietf.org/html/rfc2348>
   + timeout <https://tools.ietf.org/html/rfc2349>
   + transfer size <https://tools.ietf.org/html/rfc2349>
   + window size <https://tools.ietf.org/html/rfc7440>
-
 + Ensure strings in (eg) error packets are valid NETASCII
-
 + Add some testing goodness
-
 + Requirements traceability using <https://github.com/infidel/reqtrace>
-
 + Write a client
-
 + Add Travis
