@@ -19,9 +19,8 @@ _build/
 setup.data
 setup.log
 
-/log
-
 # Mirage droppings
+/bin/tftpd
 /bin/tftpd.xe
 /bin/tftpd.xl
 /bin/tftpd_libvirt.xml
@@ -29,13 +28,11 @@ setup.log
 /bin/log
 /bin/Makefile
 /bin/main.ml
-
-# Directory containing contents for serving
-/bin/data
 /bin/static*.ml*
+
+/log
+/files
 
 # OCaml/OPAM droppings
 doc/**
-tftp.*/**
 !tftp.opam/**
-/bin/tftpd
