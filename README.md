@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/mor1/ocaml-tftp.svg?branch=master)](https://travis-ci.org/mor1/ocaml-tftp)
+
 # A Trivial FTP Server
 
 Documentation at <http://mor1.github.io/ocaml-tftp/>.
