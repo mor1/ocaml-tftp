@@ -9,11 +9,13 @@ dev-repo:     "https://github.com/mor1/ocaml-tftp.git"
 build: [
   ["./configure" "--prefix=%{prefix}%" "--%{alcotest:enable}%-tests"]
   [make "build"]
-  [make "tftpd" "FS=direct" "NET=socket"]
   ["cp" "./tftp.opam/install" "./tftp.install"]
 ]
 
-install: [make "install"]
+install: [
+  [make "install"]
+  [make "tftpd" "FS=direct" "NET=socket" "MIRFLAGS=--no-depext --no-opam"]
+]
 
 build-test: [make "test"]
 
@@ -28,6 +30,9 @@ depends: [
   "cstruct"   {>= "1.0.1"}
   "mirage"    {>= "2.5.0"}
   "io-page"
+  "mirage-console"
+  "mirage-fs-unix"
+  "tcpip"
 ]
 
 available: [ocaml-version >= "4.01.0"]
