@@ -16,7 +16,8 @@
 
 open Mirage
 
-(** *)
+(** Mirage environment. Remove once parameter passing / `Mirage_env` is
+    accepted. *)
 
 let err fmt =
   Printf.ksprintf (fun str ->
@@ -109,7 +110,7 @@ let stack = match deploy with
 
 (** *)
 
-let datafs = mkfs fs "./data"
+let files = mkfs fs "./files"
 
 let main =
   let libraries = [ "tftp.wire"; "tftp" ] in
@@ -120,4 +121,4 @@ let main =
 let () =
   let tracing = None in
   (* let tracing = mprof_trace ~size:10000 () in *)
-  register ?tracing "tftpd" [ main $ default_console $ datafs $ stack ]
+  register ?tracing "tftpd" [ main $ default_console $ files $ stack ]
