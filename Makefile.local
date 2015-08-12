@@ -72,6 +72,11 @@ release:
 	git tag -a $(VERSION) -m "Version $(VERSION)."
 	git push upstream $(VERSION)
 
+update-release:
+	git push upstream master
+	git tag -f $(VERSION) -m "Version $(VERSION)."
+	git push --force upstream $(VERSION)
+
 publish:
 	OPAMYES=1 opam pin add -n .
 	opam publish prepare $(NAME).$(VERSION) $(ARCHIVE)
