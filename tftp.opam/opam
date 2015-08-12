@@ -25,6 +25,7 @@ remove: [
 
 depends: [
   "ocamlfind" {build}
+  "alcotest"
   "camlp4"
   "lwt"       {>= "2.4.7"}
   "cstruct"   {>= "1.0.1"}
