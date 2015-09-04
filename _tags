@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: cc840fe2d9eeadcf79ff9136f2f19898)
+# DO NOT EDIT (digest: 5793406e5925ed8831849e56a1e25274)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -18,7 +18,7 @@ true: annot, bin_annot
 "lib/tftp-wire.cmxs": use_tftp-wire
 # Library tftp
 "lib/tftp.cmxs": use_tftp
-"lib/s.cmx": for-pack(Tftp)
+"lib/tftp.cmx": for-pack(Tftp)
 <lib/*.ml{,i,y}>: pkg_cstruct
 <lib/*.ml{,i,y}>: pkg_cstruct.syntax
 <lib/*.ml{,i,y}>: pkg_io-page

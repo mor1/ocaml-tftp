@@ -11,14 +11,14 @@ Library "tftp-wire"
   Path:          lib/
   FindlibName:   wire
   FindlibParent: tftp
-  Modules:       Wire
+  Modules:       Tftp_wire
   BuildDepends:  cstruct, cstruct.syntax
 
 Library "tftp"
   Path:         lib/
   Pack:         true
   Findlibname:  tftp
-  Modules:      S
+  Modules:      Tftp
   BuildDepends: mirage, lwt, tftp.wire, io-page
 
 Document tftp
