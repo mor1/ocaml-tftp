@@ -15,6 +15,7 @@
  *)
 
 open Lwt.Infix
+module Wire = Tftp_wire
 
 let sp = Printf.sprintf
 
