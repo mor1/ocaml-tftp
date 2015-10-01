@@ -41,10 +41,10 @@ Library "tftp-server"
 Document "tftp"
   Type:             OCamlbuild (0.4)
   BuildTools+:      ocamldoc
-
   Title:            TFTP API reference
   Install:          true
+  PostCommand:      cp doc/style.css tftp.docdir/
   XOCamlbuildPath:  lib/
   XOCamlbuildExtraArgs:
-    "-docflags '-colorize-code -short-functors -charset utf-8'"
+    "-docflags '-colorize-code -short-functors -short-paths -charset utf-8'"
   XOCamlbuildLibraries: tftp.wire, tftp.server
