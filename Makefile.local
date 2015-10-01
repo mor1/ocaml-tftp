@@ -12,6 +12,8 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+.PHONY: setup-clean setup clean lib tftpd gh-pages opam
+
 ## Oasis targets
 
 setup-clean: clean distclean
@@ -30,8 +32,6 @@ clean:
 	$(SETUP) -clean $(CLEANFLAGS)
 	[ -r bin/Makefile ] && mirage clean bin/config.ml || true
 	$(RM) log bin/tftpd
-
-lib: build reinstall
 
 tftpd: bin/tftpd
 bin/tftpd: bin/Makefile bin/tftpd.ml

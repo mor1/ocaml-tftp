@@ -4,28 +4,47 @@ Version:     0.1.4
 Synopsis:    Trivial FTP
 Authors:     Richard Mortier
 License:     ISC
-Plugins:     META (0.4), DevFiles (0.4)
 BuildTools:  ocamlbuild
 
+AlphaFeatures: ocamlbuild_more_args, pure_interface
+
+Plugins:     META (0.4), DevFiles (0.4)
+XDevFilesMakefileNoTargets: clean
+XDevFilesEnableConfigure:   false
+
+Flag "wire"
+  Description: Install `tftp.wire` wire structure libs
+  Default: false
+
+Flag "server"
+  Description: Install `tftp.server` server libs
+  Default: false
+
 Library "tftp-wire"
+  Install$:         flag(wire)
   CompiledObject:   best
   Path:             lib/
   FindlibName:      wire
-  FindlibParent:    tftp
+  FindlibContainers: tftp
   Modules:          Tftp_wire
   BuildDepends:     cstruct, cstruct.syntax
 
-Library "tftp"
+Library "tftp-server"
+  Install$:         flag(server)
   CompiledObject:   best
-  Path:         lib/
-  Findlibname:  tftp
-  Modules:      Tftp
-  BuildDepends: mirage, lwt, tftp.wire, io-page
+  Path:             lib/
+  FindlibName:      server
+  FindlibContainers: tftp
+  Modules:          Tftp_S
+  BuildDepends:     mirage, lwt, tftp.wire, io-page
 
-Document tftp
-  Title:                TFTP docs
-  Type:                 OCamlbuild (0.4)
-  BuildTools+:          ocamldoc
-  Install:              true
-  XOCamlbuildPath:      lib/
-  XOCamlbuildLibraries: tftp.wire, tftp
+Document "tftp"
+  Type:             OCamlbuild (0.4)
+  BuildTools+:      ocamldoc
+
+  Title:            TFTP API reference
+  Install:          true
+  XOCamlbuildPath:  lib/
+  XOCamlbuildExtraArgs:
+    "-docflags '-colorize-code -short-functors -charset utf-8'"
+  XOCamlbuildLibraries: tftp.wire, tftp.server
