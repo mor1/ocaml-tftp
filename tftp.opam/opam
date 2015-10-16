@@ -7,7 +7,7 @@ bug-reports:  "https://github.com/mor1/ocaml-tftp/issues"
 dev-repo:     "https://github.com/mor1/ocaml-tftp.git"
 
 build: [
-  ["CONFIGUREFLAGS=--enable-lib --enable-wire" make "configure"]
+  [make "configure"]
   [make "build"]
   ["cp" "./tftp.opam/install" "./tftp.install"]
 ]
@@ -33,7 +33,6 @@ depends: [
   "mirage-console"
   "mirage-fs-unix"
   "tcpip"
-  "tftp-wire"
 ]
 
 available: [ocaml-version >= "4.01.0"]
