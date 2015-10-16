@@ -12,29 +12,18 @@ Plugins:     META (0.4), DevFiles (0.4)
 XDevFilesMakefileNoTargets: clean
 XDevFilesEnableConfigure:   false
 
-Flag "wire"
-  Description: Install `tftp.wire` wire structure libs
-  Default: false
-
-Flag "server"
-  Description: Install `tftp.server` server libs
-  Default: false
-
 Library "tftp-wire"
-  Install$:         flag(wire)
   CompiledObject:   best
   Path:             lib/
   FindlibName:      wire
-  FindlibContainers: tftp
+  FindlibParent:    tftp
   Modules:          Tftp_wire
   BuildDepends:     cstruct, cstruct.syntax
 
-Library "tftp-server"
-  Install$:         flag(server)
+Library "tftp"
   CompiledObject:   best
   Path:             lib/
-  FindlibName:      server
-  FindlibContainers: tftp
+  FindlibName:      tftp
   Modules:          Tftp_S
   BuildDepends:     mirage, lwt, tftp.wire, io-page
 
@@ -47,4 +36,4 @@ Document "tftp"
   XOCamlbuildPath:  lib/
   XOCamlbuildExtraArgs:
     "-docflags '-colorize-code -short-functors -short-paths -charset utf-8'"
-  XOCamlbuildLibraries: tftp.wire, tftp.server
+  XOCamlbuildLibraries: tftp.wire, tftp
