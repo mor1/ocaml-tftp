@@ -7,7 +7,7 @@ bug-reports:  "https://github.com/mor1/ocaml-tftp/issues"
 dev-repo:     "https://github.com/mor1/ocaml-tftp.git"
 
 build: [
-  [make "configure" "CONFIGUREFLAGS=--enable-wire"]
+  ["CONFIGUREFLAGS=--enable-wire --disable-lib" make "configure"]
   [make "build"]
   ["cp" "./tftp-wire.opam/install" "./tftp-wire.install"]
 ]
@@ -19,7 +19,7 @@ install: [
 build-test: [make "test"]
 
 remove: [
-  ["ocamlfind" "remove" "tftp"] { !tftp:installed }
+  ["ocamlfind" "remove" "tftp-wire"]
 ]
 
 depends: [
