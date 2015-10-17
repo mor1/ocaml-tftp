@@ -18,13 +18,13 @@ Library "tftp-wire"
   FindlibName:      wire
   FindlibParent:    tftp
   Modules:          Tftp_wire
-  BuildDepends:     cstruct, cstruct.syntax
+  BuildDepends:     cstruct, cstruct.syntax, sexplib.syntax
 
 Library "tftp"
   CompiledObject:   best
   Path:             lib/
   FindlibName:      tftp
-  Modules:          Tftp_S
+  Modules:          Tftp
   BuildDepends:     mirage, lwt, tftp.wire, io-page
 
 Document "tftp"
