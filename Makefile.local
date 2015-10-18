@@ -33,6 +33,10 @@ clean:
 	[ -r bin/Makefile ] && mirage clean bin/config.ml || true
 	$(RM) log bin/tftpd
 
+uninstall:
+	ocaml setup.ml -uninstall $(UNINSTALLFLAGS)
+	ocamlfind remove tftp
+
 tftpd: bin/tftpd
 bin/tftpd: bin/Makefile bin/tftpd.ml
 	mirage build bin/config.ml
