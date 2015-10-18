@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: e86905845c31a13f9bcf4a887910a692) *)
+(* DO NOT EDIT (digest: 7c6d9fd8aa347a065803dc18271b9400) *)
 module OASISGettext = struct
 (* # 22 "src/oasis/OASISGettext.ml" *)
 
@@ -608,10 +608,14 @@ open Ocamlbuild_plugin;;
 let package_default =
   {
      MyOCamlbuildBase.lib_ocaml =
-       [("tftp-wire", ["lib"], []); ("tftp", ["lib"], [])];
+       [
+          ("tftp-wire", ["lib"], []);
+          ("tftp", ["lib"], []);
+          ("tftp-mirage", ["mirage"], [])
+       ];
      lib_c = [];
      flags = [];
-     includes = []
+     includes = [("mirage", ["lib"])]
   }
   ;;
 
@@ -619,6 +623,6 @@ let conf = {MyOCamlbuildFindlib.no_automatic_syntax = false}
 
 let dispatch_default = MyOCamlbuildBase.dispatch_default conf package_default;;
 
-# 623 "myocamlbuild.ml"
+# 627 "myocamlbuild.ml"
 (* OASIS_STOP *)
 Ocamlbuild_plugin.dispatch dispatch_default;;

@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 0b4dc3c3a8487cd7652c3a3fee4c46d7)
+# DO NOT EDIT (digest: 9dfab9a2d7c5b88fb17920549dd2edd3)
 version = "0.1.4"
 description = "Trivial FTP"
 requires = "mirage lwt tftp.wire io-page"
@@ -17,6 +17,17 @@ package "wire" (
  archive(native) = "tftp-wire.cmxa"
  archive(native, plugin) = "tftp-wire.cmxs"
  exists_if = "tftp-wire.cma"
+)
+
+package "mirage" (
+ version = "0.1.4"
+ description = "Trivial FTP"
+ requires = "mirage lwt tftp"
+ archive(byte) = "tftp-mirage.cma"
+ archive(byte, plugin) = "tftp-mirage.cma"
+ archive(native) = "tftp-mirage.cmxa"
+ archive(native, plugin) = "tftp-mirage.cmxs"
+ exists_if = "tftp-mirage.cma"
 )
 # OASIS_STOP
 

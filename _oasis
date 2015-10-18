@@ -9,8 +9,18 @@ BuildTools:  ocamlbuild
 AlphaFeatures: ocamlbuild_more_args, pure_interface
 
 Plugins:     META (0.4), DevFiles (0.4)
-XDevFilesMakefileNoTargets: clean
+XDevFilesMakefileNoTargets: clean, uninstall
 XDevFilesEnableConfigure:   false
+
+
+Flag "lwt"
+  Description : Lwt_unix backend
+  Default     : true
+
+Flag "mirage"
+  Description : Mirage backend
+  Default     : true
+
 
 Library "tftp-wire"
   CompiledObject:   best
@@ -26,6 +36,23 @@ Library "tftp"
   FindlibName:      tftp
   Modules:          Tftp
   BuildDepends:     mirage, lwt, tftp.wire, io-page
+
+# Library "tftp-lwt"
+#   Build          $: flag(lwt)
+#   FindlibName     : lwt
+#   FindlibParent   : tftp
+#   Path            : lwt
+#   Modules         : Tftp_lwt
+#   BuildDepends    : lwt, tftp
+
+Library "tftp-mirage"
+  Build          $: flag(mirage)
+  FindlibName     : mirage
+  FindlibParent   : tftp
+  Path            : mirage
+  Modules         : Tftp_mirage
+  BuildDepends    : mirage, lwt, tftp
+
 
 Document "tftp"
   Type:             OCamlbuild (0.4)
