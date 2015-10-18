@@ -113,7 +113,7 @@ let stack = match deploy with
 let files = mkfs fs "./files"
 
 let main =
-  let libraries = [ "tftp.wire"; "tftp" ] in
+  let libraries = [ "tftp.wire"; "tftp"; "tftp.mirage" ] in
   let packages = [] in
   foreign ~libraries ~packages "Tftpd.Main"
     (console @-> kv_ro @-> stackv4 @-> job)
