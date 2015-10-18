@@ -46,26 +46,35 @@ module Config = struct
     files: string;
   } with sexp
 
-  let port t = t.port
-
   let default_port = 69
   let min_port = 32768
 
+  let make ?port files = {
+    port= (match port with None -> default_port | Some p -> p);
+    files;
+  }
+
+  let port t = t.port
+
 end
 
-type server = {
-  port: int;
-  conns: (Tid.t, string * int64 * int64) Hashtbl.t;
-  tids: (Ipaddr.V4.t * int, int) Hashtbl.t;
-  files: (string, int64 * Cstruct.t) Hashtbl.t;
-} with sexp
+module S = struct
 
-let server config =
-  let port = Config.port config in
-  let conns = Hashtbl.create 16 in
-  let tids = Hashtbl.create 16 in
-  let files = Hashtbl.create 16 in
-  { port; conns; tids; files }
+  type t = {
+    port: int;
+    conns: (Tid.t, string * int64 * int64) Hashtbl.t;
+    tids: (Ipaddr.V4.t * int, int) Hashtbl.t;
+    files: (string, int64 * Cstruct.t) Hashtbl.t;
+  } with sexp
+
+  let make config =
+    let port = Config.port config in
+    let conns = Hashtbl.create 16 in
+    let tids = Hashtbl.create 16 in
+    let files = Hashtbl.create 16 in
+    { port; conns; tids; files }
+
+end
 
 type mode = Octet | Netascii | Mail
 
@@ -89,7 +98,7 @@ type failure = [
 
 type ret =
   | Ok of Tid.t * success
-  | Fail of Tid.t * failure * Cstruct.t
+  | Fail of Tid.t * Cstruct.t * failure
 
 let obuf len = Cstruct.set_len (Io_page.get_buf ~n:1 ()) len
 
@@ -107,10 +116,10 @@ let errorp ?msg error =
   obuf
 
 let datap server tid filename blockno f =
-  Hashtbl.get server.files filename |> function
+  Hashtbl.get server.S.files filename |> function
   | None ->
     let errp = errorp ~msg:filename Wire.FILE_NOT_FOUND in
-    Fail (tid, `File_not_found filename, errp)
+    Fail (tid, errp, `File_not_found filename)
   | Some (filesize, data) ->
     let srcoff = Int64.(mul blockno 512L) in
     let datlen = Int64.(to_int (min 512L (sub filesize srcoff))) in
@@ -128,7 +137,8 @@ let handle_ack server tid (filename, filesize, blockno) inp =
     datap server tid filename ackno (fun p -> `Retx (ackno, p))
   else if filesize < Int64.mul blockno 512L then
     Ok (tid, `Ack_of_eof)
-  else datap server tid filename blockno (fun p -> `Packet p)
+  else
+    datap server tid filename blockno (fun p -> `Packet p)
 
 let handle_error server tid inp =
   let error = Wire.(
@@ -145,35 +155,36 @@ let handle_rrq server tid inp =
   let (mode, _inp) = Wire.string0 inp in
   match mode with
   | "octet" ->
-    if not (Hashtbl.mem server.files filename) then
+    if not (Hashtbl.mem server.S.files filename) then
       let errp = errorp ~msg:filename Wire.FILE_NOT_FOUND in
-      Fail (tid, `File_not_found filename, errp)
+      Fail (tid, errp, `File_not_found filename)
     else (
       let (sip, spt, _tftp_port) = tid in
-      Hashtbl.get server.tids ~default:Config.min_port (sip,spt) |> function
+      Hashtbl.get server.S.tids ~default:Config.min_port (sip,spt) |> function
       | None ->
         let errp = errorp ~msg:("no TID for "^filename) Wire.UNDEFINED in
-        Fail (tid, `Rrq_refused, errp)
+        Fail (tid, errp, `Rrq_refused)
       | Some local_port ->
         Ok ((sip,spt, local_port), `Request (filename, Octet))
     )
   | mode ->
-    Fail (tid, `Unsupported_mode mode,
-          errorp ~msg:("unsupported mode:"^mode) Wire.ILLEGAL_OP)
+    let errp = errorp ~msg:("unsupported mode:"^mode) Wire.ILLEGAL_OP in
+    Fail (tid, errp, `Unsupported_mode mode)
 
 let handle server sip spt dpt inp =
   let tid = Tid.(sip, spt, dpt) in
-  Hashtbl.get server.conns tid |> function
+  Hashtbl.get server.S.conns tid |> function
   | None ->
-    Fail (tid, `Unknown_tid, errorp ~msg:(Tid.to_string tid) Wire.UNKNOWN_TID)
+    let errp = errorp ~msg:(Tid.to_string tid) Wire.UNKNOWN_TID in
+    Fail (tid, errp, `Unknown_tid)
   | Some conn ->
     Wire.(inp |> get_hreq_opcode |> int_to_opcode |> function
-      | None -> Fail (tid, `Invalid_packet, inp)
+      | None -> Fail (tid, inp, `Invalid_packet)
       | Some o -> match o with
         | ACK -> handle_ack server tid conn inp
         | ERROR -> handle_error server tid inp
         | RRQ -> handle_rrq server tid inp
         | WRQ | DATA ->
           let errp = errorp ~msg:(Wire.opcode_to_string o) Wire.ILLEGAL_OP in
-          Fail (tid, `Unsupported_op o, errp)
+          Fail (tid, errp, `Unsupported_op o)
       )
