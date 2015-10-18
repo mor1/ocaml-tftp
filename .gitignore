@@ -36,3 +36,4 @@ setup.log
 # OCaml/OPAM droppings
 doc/**
 !tftp.opam/**
+/bin/tftpd.xl.in
