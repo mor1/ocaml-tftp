@@ -14,17 +14,16 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *)
 
-open Lwt
-open V1_LWT
+module Main (C: V1_LWT.CONSOLE) (FS: V1_LWT.KV_RO) (S: V1_LWT.STACKV4) = struct
 
-module Main (C: CONSOLE) (FS: KV_RO) (S: STACKV4) = struct
-
-  module T = Tftp.S.Make(C)(FS)(S)
+  module T = Tftp_mirage.S.Make(C)(FS)(S)
 
   let start c fs s =
-    let t = T.make ~c ~fs ~s () in
-    let port = T.default_port in
-    S.listen_udpv4 s ~port (T.callback ~port t);
+    let files = "./files" in
+    let config = Tftp.Config.make files in
+    let port = Tftp.Config.port config in
+    let server = Tftp.S.make config in
+    S.listen_udpv4 s ~port T.(callback ~port { server; c; fs; s });
     S.listen s
 
 end
