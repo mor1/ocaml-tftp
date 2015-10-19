@@ -1,3 +1,4 @@
-PKG mirage mirage-env lwt cstruct io-page ipaddr sexplib.syntax tftp tftp.mirage
+PKG lwt  mirage mirage-env io-page ipaddr cstruct cstruct.syntax sexplib.syntax
+PKG tftp tftp.mirage
 B _build/**
 B _build/lib_test
