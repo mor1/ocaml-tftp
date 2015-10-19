@@ -16,6 +16,7 @@
 
 open Sexplib.Std
 open Sexplib.Conv
+
 module Wire = Tftp_wire
 
 module Hashtbl = struct
@@ -39,25 +40,6 @@ module Tid = struct
 
 end
 
-module Config = struct
-
-  type t = {
-    port: int;
-    files: string;
-  } with sexp
-
-  let default_port = 69
-  let min_port = 32768
-
-  let make ?port files = {
-    port= (match port with None -> default_port | Some p -> p);
-    files;
-  }
-
-  let port t = t.port
-
-end
-
 module S = struct
 
   type t = {
@@ -66,6 +48,8 @@ module S = struct
     tids: (Ipaddr.V4.t * int, int) Hashtbl.t;
     files: (string, int64 * Cstruct.t) Hashtbl.t;
   } with sexp
+
+  let to_string t = t |> sexp_of_t |> Sexplib.Sexp.to_string_hum
 
   let make config =
     let port = Config.port config in
@@ -76,29 +60,54 @@ module S = struct
 
 end
 
-type mode = Octet | Netascii | Mail
+type mode =
+  | Octet
+  | Netascii
+  | Mail
+  | Unknown of string
+with sexp
 
-type success = [
-  | `Packet of Cstruct.t
-  | `Retx of int64 * Cstruct.t
-  | `Ack_of_error
-  | `Ack_of_eof
-  | `Error of Wire.errorcode * string
-  | `Request of string * mode
-]
+let mode_of_string = function
+  | "octet" -> Octet
+  | "netascii" -> Netascii
+  | "mail" -> Mail
+  | mode -> Unknown mode
 
-type failure = [
-  | `Unknown_tid
-  | `File_not_found of string
-  | `Invalid_packet
-  | `Unsupported_mode of string
-  | `Rrq_refused
-  | `Unsupported_op of Wire.opcode
-]
+let mode_to_string = function
+  | Octet -> "octet"
+  | Netascii -> "netascii"
+  | Mail -> "mail"
+  | Unknown mode -> mode
+
+module Success = struct
+  type t =
+    | Packet of Cstruct.t
+    | Retx of int64 * Cstruct.t
+    | Ack_of_error
+    | Ack_of_eof
+    | Error of Tftp_wire.errorcode * string
+    | Request of string * mode
+  with sexp
+
+  let to_string t = t |> sexp_of_t |> Sexplib.Sexp.to_string_hum
+end
+
+module Failure = struct
+  type t =
+    | Unknown_tid
+    | File_not_found of string
+    | Invalid_packet
+    | Unsupported_mode of mode
+    | Rrq_refused
+    | Unsupported_op of Tftp_wire.opcode
+  with sexp
+
+  let to_string t = t |> sexp_of_t |> Sexplib.Sexp.to_string_hum
+end
 
 type ret =
-  | Ok of Tid.t * success
-  | Fail of Tid.t * Cstruct.t * failure
+  | Ok of S.t * Tid.t * Success.t
+  | Fail of S.t * Tid.t * Cstruct.t * Failure.t
 
 let obuf len = Cstruct.set_len (Io_page.get_buf ~n:1 ()) len
 
@@ -119,7 +128,7 @@ let datap server tid filename blockno f =
   Hashtbl.get server.S.files filename |> function
   | None ->
     let errp = errorp ~msg:filename Wire.FILE_NOT_FOUND in
-    Fail (tid, errp, `File_not_found filename)
+    Fail (server, tid, errp, Failure.File_not_found filename)
   | Some (filesize, data) ->
     let srcoff = Int64.(mul blockno 512L) in
     let datlen = Int64.(to_int (min 512L (sub filesize srcoff))) in
@@ -127,18 +136,23 @@ let datap server tid filename blockno f =
     Wire.(set_hdat_opcode obuf (opcode_to_int DATA));
     Wire.(set_hdat_blockno obuf (Int64.to_int blockno));
     Cstruct.blit data (Int64.to_int srcoff) obuf Wire.sizeof_hdat datlen;
-    Ok (tid, f obuf)
+    Ok (server, tid, f obuf)
 
-let handle_ack server tid (filename, filesize, blockno) inp =
-  let ackno = Wire.get_hdat_blockno inp |> Int64.of_int in
-  if blockno < 0L then
-    Ok (tid, `Ack_of_error)
-  else if ackno < blockno then
-    datap server tid filename ackno (fun p -> `Retx (ackno, p))
-  else if filesize < Int64.mul blockno 512L then
-    Ok (tid, `Ack_of_eof)
-  else
-    datap server tid filename blockno (fun p -> `Packet p)
+let handle_ack server tid inp =
+  Hashtbl.get server.S.conns tid |> function
+  | None ->
+    let errp = errorp ~msg:(Tid.to_string tid) Wire.UNKNOWN_TID in
+    Fail (server, tid, errp, Failure.Unknown_tid)
+  | Some (filename, filesize, blockno) ->
+    let ackno = Wire.get_hdat_blockno inp |> Int64.of_int in
+    if blockno < 0L then
+      Ok (server, tid, Success.Ack_of_error)
+    else if ackno < blockno then
+      datap server tid filename ackno (fun p -> Success.Retx (ackno, p))
+    else if filesize < Int64.mul blockno 512L then
+      Ok (server, tid, Success.Ack_of_eof)
+    else
+      datap server tid filename blockno (fun p -> Success.Packet p)
 
 let handle_error server tid inp =
   let error = Wire.(
@@ -148,43 +162,43 @@ let handle_error server tid inp =
     )
   in
   let (msg, _) = Cstruct.shift inp Wire.sizeof_herr |> Wire.string0 in
-  Ok (tid, `Error (error, msg))
+  Ok (server, tid, Success.Error (error, msg))
 
 let handle_rrq server tid inp =
   let (filename, inp) = Cstruct.shift inp Wire.sizeof_hreq |> Wire.string0 in
   let (mode, _inp) = Wire.string0 inp in
-  match mode with
-  | "octet" ->
+  match mode_of_string mode with
+  | Unknown m as mode ->
+    let errp = errorp ~msg:"unknown mode" Wire.ILLEGAL_OP in
+    Fail (server, tid, errp, Failure.Unsupported_mode mode)
+
+  | Octet ->
     if not (Hashtbl.mem server.S.files filename) then
       let errp = errorp ~msg:filename Wire.FILE_NOT_FOUND in
-      Fail (tid, errp, `File_not_found filename)
+      Fail (server, tid, errp, Failure.File_not_found filename)
     else (
       let (sip, spt, _tftp_port) = tid in
       Hashtbl.get server.S.tids ~default:Config.min_port (sip,spt) |> function
       | None ->
-        let errp = errorp ~msg:("no TID for "^filename) Wire.UNDEFINED in
-        Fail (tid, errp, `Rrq_refused)
+        let errp = errorp ~msg:"TID failure" Wire.UNDEFINED in
+        Fail (server, tid, errp, Failure.Rrq_refused)
       | Some local_port ->
-        Ok ((sip,spt, local_port), `Request (filename, Octet))
+        let tid = (sip,spt, local_port) in
+        Ok (server, tid, Success.Request (filename, Octet))
     )
   | mode ->
-    let errp = errorp ~msg:("unsupported mode:"^mode) Wire.ILLEGAL_OP in
-    Fail (tid, errp, `Unsupported_mode mode)
+    let errp = errorp ~msg:"unsupported mode" Wire.ILLEGAL_OP in
+    Fail (server, tid, errp, Failure.Unsupported_mode mode)
 
 let handle server sip spt dpt inp =
   let tid = Tid.(sip, spt, dpt) in
-  Hashtbl.get server.S.conns tid |> function
-  | None ->
-    let errp = errorp ~msg:(Tid.to_string tid) Wire.UNKNOWN_TID in
-    Fail (tid, errp, `Unknown_tid)
-  | Some conn ->
-    Wire.(inp |> get_hreq_opcode |> int_to_opcode |> function
-      | None -> Fail (tid, inp, `Invalid_packet)
-      | Some o -> match o with
-        | ACK -> handle_ack server tid conn inp
-        | ERROR -> handle_error server tid inp
-        | RRQ -> handle_rrq server tid inp
-        | WRQ | DATA ->
-          let errp = errorp ~msg:(Wire.opcode_to_string o) Wire.ILLEGAL_OP in
-          Fail (tid, errp, `Unsupported_op o)
-      )
+  Wire.(inp |> get_hreq_opcode |> int_to_opcode |> function
+    | None -> Fail (server, tid, inp, Failure.Invalid_packet)
+    | Some o -> match o with
+      | ACK -> handle_ack server tid inp
+      | ERROR -> handle_error server tid inp
+      | RRQ -> handle_rrq server tid inp
+      | WRQ | DATA ->
+        let errp = errorp ~msg:(Wire.opcode_to_string o) Wire.ILLEGAL_OP in
+        Fail (server, tid, errp, Failure.Unsupported_op o)
+    )
