@@ -25,7 +25,7 @@ cenum errorcode {
     UNKNOWN_TID;
     FILE_EXISTS;
     UNKNOWN_USER
-  } as uint8_t
+  } as uint8_t(sexp)
 
 cenum opcode {
     RRQ = 1;
@@ -33,7 +33,7 @@ cenum opcode {
     DATA;
     ACK;
     ERROR
-  } as uint16_t
+  } as uint16_t(sexp)
 
 cstruct hreq {
     uint16_t opcode
