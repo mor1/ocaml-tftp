@@ -32,21 +32,25 @@ module S = struct
       s: STACK.t;
     }
 
-    let handle_failure { server; c; fs; s } (sip,spt,dpt) = function
-      | `Unknown_tid -> Lwt.return_unit
-      | `File_not_found filename -> Lwt.return_unit
-      | `Invalid_packet -> Lwt.return_unit
-      | `Unsupported_mode mode -> Lwt.return_unit
-      | `Rrq_refused -> Lwt.return_unit
-      | `Unsupported_op opcode -> Lwt.return_unit
+    let handle_failure { server; c; fs; s } (sip,spt,dpt) =
+      Tftp.Failure.(function
+          | Unknown_tid -> Lwt.return_unit
+          | File_not_found filename -> Lwt.return_unit
+          | Invalid_packet -> Lwt.return_unit
+          | Unsupported_mode mode -> Lwt.return_unit
+          | Rrq_refused -> Lwt.return_unit
+          | Unsupported_op opcode -> Lwt.return_unit
+        )
 
-    let handle_success { server; c; fs; s } (sip,spt,dpt) = function
-      | `Packet p -> Lwt.return_unit
-      | `Retx (blockno, p) -> Lwt.return_unit
-      | `Ack_of_error -> Lwt.return_unit
-      | `Ack_of_eof -> Lwt.return_unit
-      | `Error (errorcode, msg) -> Lwt.return_unit
-      | `Request (filename, mode) -> Lwt.return_unit
+    let handle_success { server; c; fs; s } (sip,spt,dpt) =
+      Tftp.Success.(function
+          | Packet p -> Lwt.return_unit
+          | Retx (blockno, p) -> Lwt.return_unit
+          | Ack_of_error -> Lwt.return_unit
+          | Ack_of_eof -> Lwt.return_unit
+          | Error (errorcode, msg) -> Lwt.return_unit
+          | Request (filename, mode) -> Lwt.return_unit
+        )
 
     let rec callback ~port t =
       let { server; c; s; _ } = t in
@@ -58,8 +62,18 @@ module S = struct
            );
 
          Tftp.(match handle t.server src src_port port buf with
-             | Ok (tid, success) -> handle_success t tid success
-             | Fail (tid, outp, failure) ->
+             | Ok (server, tid, success) ->
+               C.log c (sp "Tftp: Ok: tid:%s server:%s"
+                          (Tid.to_string tid) (Tftp.S.to_string server)
+                       );
+
+               handle_success t tid success
+             | Fail (server, tid, outp, failure) ->
+               C.log c (sp "Tftp: Fail: tid:%s server:%s failure:%s"
+                          (Tid.to_string tid) (Tftp.S.to_string server)
+                          "fail!"
+                       );
+
                handle_failure t tid failure >>= fun () ->
                let (sip,spt,dpt) = tid in
                let source_port = dpt in
