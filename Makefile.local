@@ -12,7 +12,8 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-.PHONY: setup-clean setup clean lib tftpd gh-pages opam
+.PHONY: setup-clean setup clean uninstall tftpd \
+		gh-pages opam test-opam pr release update-release publish
 
 ## Oasis targets
 
@@ -38,7 +39,7 @@ uninstall:
 	ocamlfind remove tftp
 
 tftpd: bin/tftpd
-bin/tftpd: bin/Makefile bin/tftpd.ml
+bin/tftpd: bin/tftpd.ml $(wildcard lib/*.ml) $(wildcard mirage/*.ml)
 	mirage build bin/config.ml
 	cp bin/_build/main.native bin/tftpd
 bin/Makefile: bin/config.ml
