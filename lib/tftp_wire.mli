@@ -34,6 +34,8 @@ val int_to_errorcode: int -> errorcode option
 val errorcode_to_int: errorcode -> int
 val errorcode_to_string: errorcode -> string
 val string_to_errorcode: string -> errorcode option
+val errorcode_of_sexp: Sexplib.Sexp.t -> errorcode
+val sexp_of_errorcode: errorcode -> Sexplib.Sexp.t
 
 (** {2 TFTP opcodes} *)
 
@@ -50,6 +52,8 @@ val int_to_opcode: int -> opcode option
 val opcode_to_int: opcode -> int
 val opcode_to_string: opcode -> string
 val string_to_opcode: string -> opcode option
+val opcode_of_sexp: Sexplib.Sexp.t -> opcode
+val sexp_of_opcode: opcode -> Sexplib.Sexp.t
 
 (** {2 Request packets, {! opcode.RRQ}/{! opcode.WRQ}} *)
 
