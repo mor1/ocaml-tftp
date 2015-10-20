@@ -34,7 +34,7 @@ Library "tftp"
   CompiledObject:   best
   Path:             lib/
   FindlibName:      tftp
-  Modules:          Tftp, Config
+  Modules:          Tftp, Tftp_config
   BuildDepends:     mirage, lwt, tftp.wire, io-page
 
 # Library "tftp-lwt"
