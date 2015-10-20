@@ -39,7 +39,8 @@ uninstall:
 	ocamlfind remove tftp
 
 tftpd: bin/tftpd
-bin/tftpd: bin/tftpd.ml $(wildcard lib/*.ml) $(wildcard mirage/*.ml)
+bin/tftpd: bin/Makefile bin/tftpd.ml \
+			$(wildcard lib/*.ml) $(wildcard mirage/*.ml)
 	mirage build bin/config.ml
 	cp bin/_build/main.native bin/tftpd
 bin/Makefile: bin/config.ml
