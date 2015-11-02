@@ -52,7 +52,7 @@ module S = struct
   let to_string t = t |> sexp_of_t |> Sexplib.Sexp.to_string_hum
 
   let make config =
-    let port = Config.port config in
+    let port = Tftp_config.port config in
     let conns = Hashtbl.create 16 in
     let tids = Hashtbl.create 16 in
     let files = Hashtbl.create 16 in
@@ -178,7 +178,7 @@ let handle_rrq server tid inp =
       Fail (server, tid, errp, Failure.File_not_found filename)
     else (
       let (sip, spt, _tftp_port) = tid in
-      Hashtbl.get server.S.tids ~default:Config.min_port (sip,spt) |> function
+      Hashtbl.get server.S.tids ~default:Tftp_config.min_port (sip,spt) |> function
       | None ->
         let errp = errorp ~msg:"TID failure" Wire.UNDEFINED in
         Fail (server, tid, errp, Failure.Rrq_refused)
