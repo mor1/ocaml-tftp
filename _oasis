@@ -51,7 +51,7 @@ Library "tftp-mirage"
   FindlibParent   : tftp
   Path            : mirage
   Modules         : Tftp_mirage
-  BuildDepends    : mirage, lwt, tftp
+  BuildDepends    : mirage-types, lwt, tftp
 
 
 Document "tftp"
