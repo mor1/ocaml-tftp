@@ -14,16 +14,21 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *)
 
-module Main (C: V1_LWT.CONSOLE) (FS: V1_LWT.KV_RO) (S: V1_LWT.STACKV4) = struct
+let src = Logs.Src.create "unikernel" ~doc:"Main unikernel code"
+module Log = (val Logs.src_log src : Logs.LOG)
 
-  module T = Tftp_mirage.S.Make(C)(FS)(S)
+module Main (C: V1.CLOCK) (FS: V1_LWT.KV_RO) (S: V1_LWT.STACKV4) = struct
+  module Logs_reporter = Mirage_logs.Make(Clock)
 
-  let start c fs s =
+  module T = Tftp_mirage.S.Make(FS)(S)
+
+  let start () fs s =
+    Logs.(set_level (Some Info));
+    Logs_reporter.(create () |> run) @@ fun () ->
     let files = "./files" in
     let config = Tftp_config.make files in
     let port = Tftp_config.port config in
     let server = Tftp.S.make config in
-    S.listen_udpv4 s ~port T.(callback ~port { server; c; fs; s });
+    S.listen_udpv4 s ~port T.(callback ~port { server; fs; s });
     S.listen s
-
 end

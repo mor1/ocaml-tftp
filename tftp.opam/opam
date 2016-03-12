@@ -33,6 +33,7 @@ depends: [
   "mirage-console"
   "mirage-fs-unix"
   "tcpip"
+  "mirage-logs"
 ]
 
 available: [ocaml-version >= "4.01.0"]

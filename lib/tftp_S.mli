@@ -19,14 +19,14 @@ open Mirage
 (** Server implementation of TFTP
     @see <http://tools.ietf.org/html/rfc1350>, "RFC 1350" *)
 
-module Make(C:V1_LWT.CONSOLE)(FS:V1_LWT.KV_RO)(S:V1_LWT.STACKV4) : sig
+module Make(FS:V1_LWT.KV_RO)(S:V1_LWT.STACKV4) : sig
 
   type t
   (** Server state record. *)
 
-  val make: c:C.t -> fs:FS.t -> s:S.t -> unit -> t
-  (** [make ~c ~fs ~s] creates a server state record from a {! V1_LWT.CONSOLE}
-      for logging output, a {! V1_LWT.KV_RO} containing the files to serve, and
+  val make: fs:FS.t -> s:S.t -> unit -> t
+  (** [make ~fs ~s] creates a server state record from
+      a {! V1_LWT.KV_RO} containing the files to serve, and
       a {! V1_LWT.STACKV4} IPv4 stack. *)
 
   val default_port: int

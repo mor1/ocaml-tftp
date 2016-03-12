@@ -16,23 +16,25 @@
 
 open Lwt.Infix
 
+let src = Logs.Src.create "tftp" ~doc:"tftp-mirage"
+module Log = (val Logs.src_log src : Logs.LOG)
+
 let sp = Printf.sprintf
 
 module S = struct
 
-  module Make (C: V1_LWT.CONSOLE) (FS: V1_LWT.KV_RO) (STACK: V1_LWT.STACKV4)
+  module Make (FS: V1_LWT.KV_RO) (STACK: V1_LWT.STACKV4)
   = struct
 
     module U = STACK.UDPV4
 
     type t = {
       server: Tftp.S.t;
-      c: C.t;
       fs: FS.t;
       s: STACK.t;
     }
 
-    let handle_failure { server; c; fs; s } (sip,spt,dpt) =
+    let handle_failure { server; fs; s } (sip,spt,dpt) =
       Tftp.Failure.(function
           | Unknown_tid -> Lwt.return_unit
           | File_not_found filename -> Lwt.return_unit
@@ -42,7 +44,7 @@ module S = struct
           | Unsupported_op opcode -> Lwt.return_unit
         )
 
-    let handle_success { server; c; fs; s } (sip,spt,dpt) =
+    let handle_success { server; fs; s } (sip,spt,dpt) =
       Tftp.Success.(function
           | Packet p -> Lwt.return_unit
           | Retx (blockno, p) -> Lwt.return_unit
@@ -53,23 +55,23 @@ module S = struct
         )
 
     let rec callback ~port t =
-      let { server; c; s; _ } = t in
-      C.log c "Tftp: starting";
+      let { server; s; _ } = t in
+      Log.info (fun f -> f "Tftp: starting");
       (fun ~src ~dst ~src_port buf ->
-         C.log c
-           (sp "Tftp: rx %s.%d > %s.%d"
-              (Ipaddr.V4.to_string src) src_port (Ipaddr.V4.to_string dst) port
-           );
+         Log.info (fun f ->
+           f "Tftp: rx %s.%d > %s.%d"
+             (Ipaddr.V4.to_string src) src_port (Ipaddr.V4.to_string dst) port
+         );
 
          Tftp.(match handle t.server src src_port port buf with
              | Ok (server, tid, success) ->
-               C.log c (sp "Tftp: Ok: tid:%s server:%s"
+               Log.info (fun f -> f "Tftp: Ok: tid:%s server:%s"
                           (Tid.to_string tid) (Tftp.S.to_string server)
                        );
 
                handle_success t tid success
              | Fail (server, tid, outp, failure) ->
-               C.log c (sp "Tftp: Fail: tid:%s server:%s failure:%s"
+               Log.info (fun f -> f "Tftp: Fail: tid:%s server:%s failure:%s"
                           (Tid.to_string tid) (Tftp.S.to_string server)
                           "fail!"
                        );
