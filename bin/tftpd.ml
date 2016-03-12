@@ -20,8 +20,8 @@ module Main (C: V1_LWT.CONSOLE) (FS: V1_LWT.KV_RO) (S: V1_LWT.STACKV4) = struct
 
   let start c fs s =
     let files = "./files" in
-    let config = Tftp.Config.make files in
-    let port = Tftp.Config.port config in
+    let config = Tftp_config.make files in
+    let port = Tftp_config.port config in
     let server = Tftp.S.make config in
     S.listen_udpv4 s ~port T.(callback ~port { server; c; fs; s });
     S.listen s
