@@ -113,12 +113,12 @@ let stack = match deploy with
 let files = mkfs fs "./files"
 
 let main =
-  let libraries = [ "tftp.wire"; "tftp"; "tftp.mirage" ] in
-  let packages = [] in
+  let libraries = [ "tftp.wire"; "tftp"; "tftp.mirage"; "mirage-logs" ] in
+  let packages = [ "mirage-logs" ] in
   foreign ~libraries ~packages "Tftpd.Main"
-    (console @-> kv_ro @-> stackv4 @-> job)
+    (clock @-> kv_ro @-> stackv4 @-> job)
 
 let () =
   let tracing = None in
   (* let tracing = mprof_trace ~size:10000 () in *)
-  register ?tracing "tftpd" [ main $ default_console $ files $ stack ]
+  register ?tracing "tftpd" [ main $ default_clock $ files $ stack ]

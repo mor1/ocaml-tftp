@@ -31,7 +31,7 @@ module Hashtbl = struct
 
 end
 
-module Make(C:V1_LWT.CONSOLE)(FS:V1_LWT.KV_RO)(S:V1_LWT.STACKV4) = struct
+module Make(FS:V1_LWT.KV_RO)(S:V1_LWT.STACKV4) = struct
 
   module U = S.UDPV4
 
